@@ -1,0 +1,51 @@
+<!-- 17. Three Good Reasons Accordion -->
+<section class="bg-white py-16 md:py-24">
+    <div class="max-w-4xl mx-auto px-4 md:px-8">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Three good reasons to work with us</h2>
+        
+        <div class="space-y-4 mb-12">
+            <!-- Accordion Item 1 -->
+            <div class="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-lg">
+                <button class="w-full flex items-center justify-between text-left" onclick="toggleAccordion(1)">
+                    <h3 class="text-xl font-bold text-electric-blue">Ready to Scale Your Business?</h3>
+                    <i class="fas fa-chevron-up text-electric-blue transform transition-transform" id="icon-1"></i>
+                </button>
+                <div class="mt-4 text-gray-700" id="content-1">
+                    <p>With KATALYST, you'll gain access to a network of elite of experts who can help you close more more deals and expand your service offerings effortlessly.</p>
+                </div>
+            </div>
+            
+            <!-- Accordion Item 2 -->
+            <div class="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-lg">
+                <button class="w-full flex items-center justify-between text-left" onclick="toggleAccordion(2)">
+                    <h3 class="text-xl font-bold text-gray-900">Looking to Attract More Customers?</h3>
+                    <i class="fas fa-chevron-up text-electric-blue transform transition-transform" id="icon-2"></i>
+                </button>
+                <div class="hidden mt-4 text-gray-700" id="content-2">
+                    <p>Our AI-powered lead generation and customer engagement tools help you attract, nurture, and convert more customers than ever before.</p>
+                </div>
+            </div>
+            
+            <!-- Accordion Item 3 -->
+            <div class="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-lg">
+                <button class="w-full flex items-center justify-between text-left" onclick="toggleAccordion(3)">
+                    <h3 class="text-xl font-bold text-gray-900">Want to Boost Client Retention?</h3>
+                    <i class="fas fa-chevron-up text-electric-blue transform transition-transform" id="icon-3"></i>
+                </button>
+                <div class="hidden mt-4 text-gray-700" id="content-3">
+                    <p>Keep your clients engaged and satisfied with automated follow-ups, personalized communication, and proactive customer service powered by AI.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#discovery" class="px-8 py-4 bg-deep-navy text-white font-semibold rounded-lg hover:opacity-90 transition-all text-center">
+                Book A Discovery Call
+            </a>
+            <a href="#pricing" class="px-8 py-4 border-2 border-electric-blue text-electric-blue font-semibold rounded-lg hover:bg-electric-blue hover:text-white transition-all text-center flex items-center justify-center gap-2">
+                SEE PRICING LIST <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
