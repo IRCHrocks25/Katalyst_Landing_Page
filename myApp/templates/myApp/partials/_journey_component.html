@@ -1,0 +1,184 @@
+<script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    function NoScrollJourney() {
+        const [journey, setJourney] = useState(null);
+        const [currentId, setCurrentId] = useState("");
+        const [history, setHistory] = useState([]);
+
+        useEffect(() => {
+            fetch("/api/journey")
+                .then(r => r.json())
+                .then((data) => {
+                    setJourney(data);
+                    setCurrentId(data.start);
+                    // Handle URL params for deep linking
+                    const params = new URLSearchParams(window.location.search);
+                    const step = params.get('step');
+                    if (step && data.nodes[step]) {
+                        setCurrentId(step);
+                    }
+                })
+                .catch(err => console.error("Failed to load journey:", err));
+        }, []);
+
+        const node = useMemo(() => (journey ? journey.nodes[currentId] : null), [journey, currentId]);
+
+        function go(to) {
+            if (!journey || !journey.nodes[to]) return;
+            setHistory(prev => [...prev, currentId]);
+            setCurrentId(to);
+            window.history.replaceState(null, "", `?step=${encodeURIComponent(to)}`);
+        }
+
+        function back() {
+            setHistory(prev => {
+                if (!prev.length) return prev;
+                const next = prev.slice(0, -1);
+                const last = prev[prev.length - 1];
+                setCurrentId(last);
+                window.history.replaceState(null, "", `?step=${encodeURIComponent(last)}`);
+                return next;
+            });
+        }
+
+        function home() {
+            if (!journey) return;
+            setHistory([]);
+            setCurrentId(journey.start);
+            window.history.replaceState(null, "", `?step=${encodeURIComponent(journey.start)}`);
+        }
+
+        if (!node) {
+            return (
+                <div className="h-screen w-full grid place-items-center bg-deep-navy text-white">
+                    <div className="text-sm opacity-70">Loading journey…</div>
+                </div>
+            );
+        }
+
+        // Get icon class based on icon name
+        function getIconClass(iconName) {
+            const iconMap = {
+                'bolt': 'fa-bolt',
+                'robot': 'fa-robot',
+                'chart': 'fa-chart-line',
+                'users': 'fa-users',
+                'rocket': 'fa-rocket',
+                'brain': 'fa-brain'
+            };
+            return iconMap[iconName] || 'fa-circle';
+        }
+
+        return (
+            <div className="h-screen w-full overflow-hidden bg-deep-navy text-white relative">
+                {/* Subtle atmosphere gradients */}
+                <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute -top-40 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-electric-pink/10 blur-3xl" />
+                    <div className="absolute -bottom-48 right-[-120px] h-[520px] w-[520px] rounded-full bg-electric-blue/10 blur-3xl" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/0 to-deep-navy/50" />
+                </div>
+
+                {/* Top controls */}
+                <div className="relative z-10 max-w-6xl mx-auto px-6 pt-6 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={back}
+                            disabled={history.length === 0}
+                            className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:hover:bg-white/10 transition backdrop-blur-sm"
+                            aria-label="Back"
+                        >
+                            <i className="fas fa-arrow-left"></i>
+                        </button>
+                        <button
+                            onClick={home}
+                            className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 transition backdrop-blur-sm"
+                            aria-label="Home"
+                        >
+                            <i className="fas fa-home"></i>
+                        </button>
+                    </div>
+
+                    <div className="text-xs tracking-[0.28em] uppercase opacity-60 hidden md:block">
+                        Katalyst · AI Growth Engine
+                    </div>
+                </div>
+
+                {/* Scene content */}
+                <div className="relative z-10 max-w-6xl mx-auto px-6 h-[calc(100vh-84px)] grid items-center">
+                    <div className={`${node.kind === 'hero' ? 'max-w-4xl' : 'max-w-3xl'} w-full`}>
+                        {node.eyebrow && (
+                            <div className="text-[11px] tracking-[0.32em] uppercase opacity-60 mb-2">
+                                {node.eyebrow}
+                            </div>
+                        )}
+
+                        {node.icon && (
+                            <div className="mb-4 text-electric-pink text-4xl">
+                                <i className={`fas ${getIconClass(node.icon)}`}></i>
+                            </div>
+                        )}
+
+                        <h1 className={`mt-4 font-semibold leading-[1.02] text-white ${
+                            node.kind === 'hero' 
+                                ? 'text-5xl md:text-7xl' 
+                                : 'text-4xl md:text-6xl'
+                        }`}>
+                            {node.title}
+                        </h1>
+
+                        {node.subtitle && (
+                            <div className="mt-4 text-xl md:text-2xl opacity-85 text-cyan-teal">
+                                {node.subtitle}
+                            </div>
+                        )}
+
+                        {node.body && (
+                            <div className="mt-6 text-base md:text-lg leading-relaxed text-white/75 space-y-4">
+                                {node.body.split('\n').map((paragraph, idx) => (
+                                    paragraph.trim() && (
+                                        <p key={idx} className={idx === 0 ? '' : 'mt-4'}>
+                                            {paragraph}
+                                        </p>
+                                    )
+                                ))}
+                            </div>
+                        )}
+
+                        <div className={`mt-10 flex flex-col gap-3 ${
+                            node.choices && node.choices.length > 2 ? 'sm:grid sm:grid-cols-2' : 'sm:flex-row'
+                        }`}>
+                            {node.choices && node.choices.map((c, idx) => (
+                                <button
+                                    key={`${c.to}-${idx}`}
+                                    onClick={() => go(c.to)}
+                                    className={`group inline-flex items-center justify-between gap-3 rounded-2xl px-6 py-4 font-semibold transition-all transform hover:scale-[1.02] ${
+                                        node.kind === 'cta' 
+                                            ? 'bg-gradient-to-r from-electric-pink to-electric-blue text-white hover:shadow-lg hover:shadow-electric-pink/50' 
+                                            : idx === 0 && node.choices.length > 1
+                                            ? 'bg-gradient-to-r from-electric-pink to-electric-blue text-white hover:shadow-lg hover:shadow-electric-pink/50'
+                                            : 'bg-white text-deep-navy hover:bg-white/95 hover:shadow-xl'
+                                    }`}
+                                >
+                                    <span>{c.label}</span>
+                                    <i className="fas fa-chevron-right opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                                </button>
+                            ))}
+                        </div>
+
+                        {node.kind !== 'cta' && (
+                            <div className="mt-6 text-xs text-white/50">
+                                <i className="fas fa-lightbulb mr-2"></i>
+                                Tip: Each choice takes you deeper into your personalized journey
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Render the component
+    ReactDOM.render(<NoScrollJourney />, document.getElementById('journey-root'));
+</script>
+

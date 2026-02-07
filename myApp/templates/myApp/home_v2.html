@@ -1,0 +1,13 @@
+{% extends 'myApp/base_v2.html' %}
+
+{% block extra_head %}
+    {% include 'myApp/new_partial/_journey_head.html' %}
+{% endblock %}
+
+{% block content %}
+    {% include 'myApp/new_partial/_journey_init.html' %}
+{% endblock %}
+
+{% block extra_scripts %}
+    {% include 'myApp/new_partial/_journey_component.html' %}
+{% endblock %}
